@@ -1,0 +1,227 @@
+Total: 2982 samples
+    2794  93.7%  93.7%     2981 100.0% wrapper
+     139   4.7%  98.4%      139   4.7% SortedList_insert
+      47   1.6%  99.9%       47   1.6% SortedList_lookup
+       1   0.0% 100.0%        1   0.0% SortedList_delete
+       1   0.0% 100.0%        1   0.0% res_thread_freeres
+       0   0.0% 100.0%     2982 100.0% __clone
+       0   0.0% 100.0%        1   0.0% __libc_thread_freeres
+       0   0.0% 100.0%     2982 100.0% start_thread
+ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/lab2_list.c
+  2794   2981 Total samples (flat / cumulative)
+     .      .   37: }
+     .      .   38: 
+     .      .   39: pthread_mutex_t lock;
+     .      .   40: volatile int spinlock = 0;
+     .      .   41: void *wrapper(void* startVoid)
+---
+     .      .   42: {
+     .      .   43:   if (errorThrown != 0)//If on thread calls errorMessage, everyone exit
+     .      .   44:     exit(errorThrown);
+     .      .   45:   int start = * (int *)startVoid;
+     .      .   46:   int end = numIters + start;
+     .      .   47: 
+     .      .   48:   if (syncCh == 's')
+     .      .   49:     {
+     .      .   50:       //       while (__sync_lock_test_and_set(&spinlock, 1)) {};
+     .      .   51:       int i = start;
+     .      .   52: 
+     .      .   53:       for (; i < end; i++)
+     .      .   54: 	{
+  1868   1868   55: 	  while (__sync_lock_test_and_set(&spinlock, 1)) {};      
+     .    139   56: 	  SortedList_insert(headElement, &elementArray[i]);
+     .      .   57: 	  if (headElement-> key != NULL)
+     .      .   58: 	    errorMessage("There was a problem with insertion", 2);
+     .      .   59: 	  __sync_lock_release(&spinlock);
+     .      .   60: 	}
+     .      .   61: 
+     2      2   62:       while (__sync_lock_test_and_set(&spinlock, 1)) {};
+     .      .   63:       if (SortedList_length(headElement) == -1)
+     .      .   64: 	errorMessage("There was an inconsistency when getting length", 2);
+     .      .   65:       __sync_lock_release(&spinlock);
+     .      .   66: 
+     .      .   67: 
+     .      .   68:       for (i = start; i < end; i++)
+     .      .   69: 	{
+   924    924   70: 	  while (__sync_lock_test_and_set(&spinlock, 1)) {};
+     .     47   71: 	  SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+     .      .   72: 	  if (temp == NULL)
+     .      .   73: 	    errorMessage("There was an inconsistency when looking up", 2);
+     .      1   74: 	  if (SortedList_delete(temp) == 1)
+     .      .   75: 	    errorMessage("There was an inconsistency when deleting", 2);
+     .      .   76: 	  __sync_lock_release(&spinlock);
+     .      .   77: 	}
+     .      .   78:       
+     .      .   79: 
+     .      .   80:       //              __sync_lock_release(&spinlock);
+     .      .   81:     }
+     .      .   82:   else if (syncCh == 'm')
+     .      .   83:     {
+     .      .   84:       //      pthread_mutex_lock(&lock);
+     .      .   85:       int i = start;
+     .      .   86:       for (; i < end; i++)
+     .      .   87: 	{
+     .      .   88: 	  pthread_mutex_lock(&lock);
+     .      .   89: 	  SortedList_insert(headElement, &elementArray[i]);
+     .      .   90: 	  if (headElement-> key != NULL)
+     .      .   91: 	    errorMessage("There was a problem with insertion", 2);
+     .      .   92: 	  pthread_mutex_unlock(&lock);      
+     .      .   93: 	}
+     .      .   94: 
+     .      .   95: 
+     .      .   96:       pthread_mutex_lock(&lock);
+     .      .   97:       if (SortedList_length(headElement) == -1)
+     .      .   98: 	errorMessage("There was an inconsistency when getting length", 2);
+     .      .   99:       pthread_mutex_unlock(&lock);
+     .      .  100: 
+     .      .  101: 
+     .      .  102:       for (i = start; i < end; i++)
+     .      .  103: 	{
+     .      .  104: 	  pthread_mutex_lock(&lock);
+     .      .  105: 	      SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+     .      .  106: 	      if (temp == NULL)
+     .      .  107: 		errorMessage("There was an inconsistency when looking up", 2);
+     .      .  108: 	      if (SortedList_delete(temp) == 1)
+     .      .  109: 		errorMessage("There was an inconsistency when deleting", 2);
+     .      .  110: 	      pthread_mutex_unlock(&lock);
+     .      .  111: 	    }
+     .      .  112:       
+     .      .  113:       // pthread_mutex_unlock(&lock);
+     .      .  114:     }
+     .      .  115:   else
+     .      .  116:     {
+     .      .  117: 	  int i = start;
+     .      .  118: 	  for (; i < end; i++)
+     .      .  119: 	    {
+     .      .  120: 	      SortedList_insert(headElement, &elementArray[i]);
+     .      .  121: 	      if (headElement-> key != NULL)
+     .      .  122: 		errorMessage("There was a problem with insertion", 2);
+     .      .  123: 	    }
+     .      .  124: 	  if (SortedList_length(headElement) == -1)
+     .      .  125: 	    errorMessage("There was an inconsistency when getting length", 2);
+     .      .  126: 	  for (i = start; i < end; i++)
+     .      .  127: 	    {
+     .      .  128: 	      SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+     .      .  129: 	      if (temp == NULL)
+     .      .  130: 		errorMessage("There was an inconsistency when looking up", 2);
+     .      .  131: 	      if (SortedList_delete(temp) == 1)
+     .      .  132: 		errorMessage("There was an inconsistency when deleting", 2);
+     .      .  133: 	    }
+     .      .  134:     }    
+     .      .  135:   return NULL;
+     .      .  136: }
+---
+     .      .  137: void random_key(SortedListElement_t *element)
+     .      .  138: {
+     .      .  139:   char charset[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+     .      .  140:   char *temp = malloc(length * sizeof(char));
+     .      .  141:   if (temp == NULL)
+ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/lab2_list.c
+  2794   2981 Total samples (flat / cumulative)
+     .      .   37: }
+     .      .   38: 
+     .      .   39: pthread_mutex_t lock;
+     .      .   40: volatile int spinlock = 0;
+     .      .   41: void *wrapper(void* startVoid)
+---
+     .      .   42: {
+     .      .   43:   if (errorThrown != 0)//If on thread calls errorMessage, everyone exit
+     .      .   44:     exit(errorThrown);
+     .      .   45:   int start = * (int *)startVoid;
+     .      .   46:   int end = numIters + start;
+     .      .   47: 
+     .      .   48:   if (syncCh == 's')
+     .      .   49:     {
+     .      .   50:       //       while (__sync_lock_test_and_set(&spinlock, 1)) {};
+     .      .   51:       int i = start;
+     .      .   52: 
+     .      .   53:       for (; i < end; i++)
+     .      .   54: 	{
+  1868   1868   55: 	  while (__sync_lock_test_and_set(&spinlock, 1)) {};      
+     .    139   56: 	  SortedList_insert(headElement, &elementArray[i]);
+     .      .   57: 	  if (headElement-> key != NULL)
+     .      .   58: 	    errorMessage("There was a problem with insertion", 2);
+     .      .   59: 	  __sync_lock_release(&spinlock);
+     .      .   60: 	}
+     .      .   61: 
+     2      2   62:       while (__sync_lock_test_and_set(&spinlock, 1)) {};
+     .      .   63:       if (SortedList_length(headElement) == -1)
+     .      .   64: 	errorMessage("There was an inconsistency when getting length", 2);
+     .      .   65:       __sync_lock_release(&spinlock);
+     .      .   66: 
+     .      .   67: 
+     .      .   68:       for (i = start; i < end; i++)
+     .      .   69: 	{
+   924    924   70: 	  while (__sync_lock_test_and_set(&spinlock, 1)) {};
+     .     47   71: 	  SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+     .      .   72: 	  if (temp == NULL)
+     .      .   73: 	    errorMessage("There was an inconsistency when looking up", 2);
+     .      1   74: 	  if (SortedList_delete(temp) == 1)
+     .      .   75: 	    errorMessage("There was an inconsistency when deleting", 2);
+     .      .   76: 	  __sync_lock_release(&spinlock);
+     .      .   77: 	}
+     .      .   78:       
+     .      .   79: 
+     .      .   80:       //              __sync_lock_release(&spinlock);
+     .      .   81:     }
+     .      .   82:   else if (syncCh == 'm')
+     .      .   83:     {
+     .      .   84:       //      pthread_mutex_lock(&lock);
+     .      .   85:       int i = start;
+     .      .   86:       for (; i < end; i++)
+     .      .   87: 	{
+     .      .   88: 	  pthread_mutex_lock(&lock);
+     .      .   89: 	  SortedList_insert(headElement, &elementArray[i]);
+     .      .   90: 	  if (headElement-> key != NULL)
+     .      .   91: 	    errorMessage("There was a problem with insertion", 2);
+     .      .   92: 	  pthread_mutex_unlock(&lock);      
+     .      .   93: 	}
+     .      .   94: 
+     .      .   95: 
+     .      .   96:       pthread_mutex_lock(&lock);
+     .      .   97:       if (SortedList_length(headElement) == -1)
+     .      .   98: 	errorMessage("There was an inconsistency when getting length", 2);
+     .      .   99:       pthread_mutex_unlock(&lock);
+     .      .  100: 
+     .      .  101: 
+     .      .  102:       for (i = start; i < end; i++)
+     .      .  103: 	{
+     .      .  104: 	  pthread_mutex_lock(&lock);
+     .      .  105: 	      SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+     .      .  106: 	      if (temp == NULL)
+     .      .  107: 		errorMessage("There was an inconsistency when looking up", 2);
+     .      .  108: 	      if (SortedList_delete(temp) == 1)
+     .      .  109: 		errorMessage("There was an inconsistency when deleting", 2);
+     .      .  110: 	      pthread_mutex_unlock(&lock);
+     .      .  111: 	    }
+     .      .  112:       
+     .      .  113:       // pthread_mutex_unlock(&lock);
+     .      .  114:     }
+     .      .  115:   else
+     .      .  116:     {
+     .      .  117: 	  int i = start;
+     .      .  118: 	  for (; i < end; i++)
+     .      .  119: 	    {
+     .      .  120: 	      SortedList_insert(headElement, &elementArray[i]);
+     .      .  121: 	      if (headElement-> key != NULL)
+     .      .  122: 		errorMessage("There was a problem with insertion", 2);
+     .      .  123: 	    }
+     .      .  124: 	  if (SortedList_length(headElement) == -1)
+     .      .  125: 	    errorMessage("There was an inconsistency when getting length", 2);
+     .      .  126: 	  for (i = start; i < end; i++)
+     .      .  127: 	    {
+     .      .  128: 	      SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+     .      .  129: 	      if (temp == NULL)
+     .      .  130: 		errorMessage("There was an inconsistency when looking up", 2);
+     .      .  131: 	      if (SortedList_delete(temp) == 1)
+     .      .  132: 		errorMessage("There was an inconsistency when deleting", 2);
+     .      .  133: 	    }
+     .      .  134:     }    
+     .      .  135:   return NULL;
+     .      .  136: }
+---
+     .      .  137: void random_key(SortedListElement_t *element)
+     .      .  138: {
+     .      .  139:   char charset[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+     .      .  140:   char *temp = malloc(length * sizeof(char));
+     .      .  141:   if (temp == NULL)
