@@ -44,7 +44,7 @@ set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y
 set output 'lab2b_list-1.png'
-set key left top
+set key right top
 plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
      title 'Throughput w/mutex' with linespoints lc rgb 'blue', \
@@ -81,7 +81,7 @@ set logscale x 2
 set xrange [0.75:]
 set ylabel "Successful Iterations"
 set logscale y 10
-set output 'lab2_list-3.png'
+set output 'lab2b_list-3.png'
 # note that unsuccessful runs should have produced no output
 plot \
      "< grep 'list-id-none,[0-9]*,[0-9]*,4' lab2_list.csv" using ($2):($3) \
@@ -104,7 +104,7 @@ set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y 10
 set output 'lab2b_list-4.png'
-set key left top
+set key right bottom
 plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
      title '1 List w/mutex' with linespoints lc rgb 'blue', \
@@ -128,7 +128,7 @@ set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y 10
 set output 'lab2b_list-5.png'
-set key left top
+set key right top
 plot \
      "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
      title '1 List w/mutex' with linespoints lc rgb 'blue', \
