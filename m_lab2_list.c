@@ -17,7 +17,6 @@
 //Intialize flags and threads
 int numIters=1;
 int numThreads=1; 
-int numList = 1;
 int opt_yield = 0; //Define the variable from SortedList.h
 char syncCh = 'n';
 //Holds pool of elements
@@ -25,7 +24,6 @@ SortedListElement_t *elementArray;
 SortedListElement_t *headElement;
 int numElements;
 int errorThrown = 0;
-long long * timeArray;
 void handler()
 {
   fprintf(stderr, "There was a segfault error");
@@ -46,8 +44,7 @@ void *wrapper(void* startVoid)
     exit(errorThrown);
   int start = * (int *)startVoid;
   int end = numIters + start;
-  int timeIndex = start / numIters; //Use time index as list key
-  int listKey = (start / numIters) % numList;
+
   if (syncCh == 's')
     {
       //       while (__sync_lock_test_and_set(&spinlock, 1)) {};
@@ -56,14 +53,14 @@ void *wrapper(void* startVoid)
       for (; i < end; i++)
 	{
 	  while (__sync_lock_test_and_set(&spinlock, 1)) {};      
-	  SortedList_insert(&headElement[listKey], &elementArray[i]);
-	  if (headElement[listKey].key != NULL)
+	  SortedList_insert(headElement, &elementArray[i]);
+	  if (headElement-> key != NULL)
 	    errorMessage("There was a problem with insertion", 2);
 	  __sync_lock_release(&spinlock);
 	}
 
       while (__sync_lock_test_and_set(&spinlock, 1)) {};
-      if (SortedList_length(&headElement[listKey]) == -1)
+      if (SortedList_length(headElement) == -1)
 	errorMessage("There was an inconsistency when getting length", 2);
       __sync_lock_release(&spinlock);
 
@@ -71,7 +68,7 @@ void *wrapper(void* startVoid)
       for (i = start; i < end; i++)
 	{
 	  while (__sync_lock_test_and_set(&spinlock, 1)) {};
-	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
+	  SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
 	  if (temp == NULL)
 	    errorMessage("There was an inconsistency when looking up", 2);
 	  if (SortedList_delete(temp) == 1)
@@ -85,42 +82,27 @@ void *wrapper(void* startVoid)
   else if (syncCh == 'm')
     {
       //      pthread_mutex_lock(&lock);
-      struct timespec begin;
-      struct timespec finish;
-      long long runtime;
       int i = start;
       for (; i < end; i++)
 	{
-	  clock_gettime(CLOCK_REALTIME, &begin);
 	  pthread_mutex_lock(&lock);
-	  clock_gettime(CLOCK_REALTIME, &finish);
-	    runtime = ((1000000000* finish.tv_sec) + finish.tv_nsec) - ((1000000000* begin.tv_sec) + begin.tv_nsec);
-	    timeArray[timeIndex] += runtime;
-	  SortedList_insert(&headElement[listKey], &elementArray[i]);
-	  if (headElement[listKey].key != NULL)
+	  SortedList_insert(headElement, &elementArray[i]);
+	  if (headElement-> key != NULL)
 	    errorMessage("There was a problem with insertion", 2);
 	  pthread_mutex_unlock(&lock);      
 	}
-      
-      clock_gettime(CLOCK_REALTIME, &begin);
+
+
       pthread_mutex_lock(&lock);
-      clock_gettime(CLOCK_REALTIME, &finish);
-      runtime = ((1000000000* finish.tv_sec) + finish.tv_nsec) - ((1000000000* begin.tv_sec) + begin.tv_nsec);
-      timeArray[timeIndex] += runtime;
-      if (SortedList_length(&headElement[listKey]) == -1)
+      if (SortedList_length(headElement) == -1)
 	errorMessage("There was an inconsistency when getting length", 2);
       pthread_mutex_unlock(&lock);
 
 
       for (i = start; i < end; i++)
 	{
-
-	  clock_gettime(CLOCK_REALTIME, &begin);
 	  pthread_mutex_lock(&lock);
-	  clock_gettime(CLOCK_REALTIME, &finish);
-	  runtime = ((1000000000* finish.tv_sec) + finish.tv_nsec) - ((1000000000* begin.tv_sec) + begin.tv_nsec);
-	  timeArray[timeIndex] += runtime;
-	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
+	  SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
 	  if (temp == NULL)
 	    errorMessage("There was an inconsistency when looking up", 2);
 	  if (SortedList_delete(temp) == 1)
@@ -132,23 +114,23 @@ void *wrapper(void* startVoid)
     }
   else
     {
-	  int i = start;
-	  for (; i < end; i++)
-	    {
-	      SortedList_insert(&headElement[listKey], &elementArray[i]);
-	      if (headElement[listKey].key != NULL)
-		errorMessage("There was a problem with insertion", 2);
-	    }
-	  if (SortedList_length(&headElement[listKey]) == -1)
-	    errorMessage("There was an inconsistency when getting length", 2);
-	  for (i = start; i < end; i++)
-	    {
-	      SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
-	      if (temp == NULL)
-		errorMessage("There was an inconsistency when looking up", 2);
-	      if (SortedList_delete(temp) == 1)
-		errorMessage("There was an inconsistency when deleting", 2);
-	    }
+      int i = start;
+      for (; i < end; i++)
+	{
+	  SortedList_insert(headElement, &elementArray[i]);
+	  if (headElement-> key != NULL)
+	    errorMessage("There was a problem with insertion", 2);
+	}
+      if (SortedList_length(headElement) == -1)
+	errorMessage("There was an inconsistency when getting length", 2);
+      for (i = start; i < end; i++)
+	{
+	  SortedList_t * temp = SortedList_lookup(headElement, elementArray[i].key);
+	  if (temp == NULL)
+	    errorMessage("There was an inconsistency when looking up", 2);
+	  if (SortedList_delete(temp) == 1)
+	    errorMessage("There was an inconsistency when deleting", 2);
+	}
     }    
   return NULL;
 }
@@ -180,14 +162,13 @@ int main(int argc, char*argv[])
     {"threads", required_argument, 0, 't'},
     {"iterations", required_argument, 0, 'i'},
     {"yield", required_argument, 0, 'y'},
-    {"list", required_argument, 0, 'l'},
     {"sync", required_argument, 0, 's'},
     {NULL, 0, NULL, 0}
   };
   int option_index = 0;
   while (1)
     {
-      int c = getopt_long(argc, argv, "l:y:t:i:s:", command_options, &option_index);
+      int c = getopt_long(argc, argv, "y:t:i:s:", command_options, &option_index);
       if (c == -1)
         break;
       switch(c)
@@ -197,9 +178,6 @@ int main(int argc, char*argv[])
           break;
         case 'i':
           numIters = atoi(optarg);
-          break;
-        case 'l':
-          numList = atoi(optarg);
           break;
         case 's':
           syncCh = optarg[0]; //First letter holds what type of sync
@@ -226,27 +204,20 @@ int main(int argc, char*argv[])
 	  strcpy(yieldName, optarg);
 	  break;
         default:
-          fprintf(stderr, "Option not allowed. Use --list=# --yield=[idl] --threads=# --iterations=#");
+          fprintf(stderr, "Option not allowed. Use --threads=# --iterations=#");
           exit(1);
         }
     }
 
   //INITIALIIZE LIST ELEMENTS
-  //Allocate array of headElements
   numElements = numIters * numThreads; //numIters
-  headElement = malloc(numList * sizeof(SortedListElement_t));
+  headElement = malloc(sizeof(SortedListElement_t));
   if (headElement == NULL)
     errorMessage("Error allocating space for elements", 1);
-  int h = 0;
-  for (; h < numList; h++)
-    {
-      headElement[h].next = &headElement[h];
-      headElement[h].prev = &headElement[h];
-      headElement[h].key = NULL;
-    }
-
-  //Initialize time array
-  timeArray = calloc(numThreads, sizeof(long long));
+  headElement->next = headElement;
+  headElement->prev = headElement;
+  headElement->key = NULL;
+  // printf("numElements: %d \n", numElements);
   //Make array of elements
   elementArray = malloc(sizeof(SortedListElement_t) * numElements);
   if (elementArray == NULL)
@@ -284,29 +255,21 @@ int main(int argc, char*argv[])
 	errorMessage("Error with joining threads", 1);
     }
 
-  if (SortedList_length(&headElement[0]) != 0)
+  if (SortedList_length(headElement) != 0)
     errorMessage("The list length was not 0 at the end: ", 2);
 
   clock_gettime(CLOCK_REALTIME, &end);
   long long runtime = ((1000000000* end.tv_sec) + end.tv_nsec) - ((1000000000* start.tv_sec) + start.tv_nsec);
   long operations = numThreads * numIters * 3;
   long average = runtime/operations;
-  int k = 0;
-  long long totalLockTime = 0;
-  if (syncCh == 'm'){
-    for (; k < numThreads; k++)
-      totalLockTime += timeArray[k];
-  }
-  //Each threads waits three times for the lock
-  long long averageLockTime = totalLockTime / (numThreads * 3);
   if (yieldName[0]==0)
     yieldName = "none";
   if (syncCh == 'n')
-    printf("list-%s-%s,%ld,%ld,%ld,%ld,%ld,%ld,0", yieldName, "none", (long int) numThreads, (long int) numIters,
-	   (long int) numList, (long int) operations, (long int) runtime, (long int) average);
+    printf("list-%s-%s,%ld,%ld,%ld,%ld,%ld,%ld", yieldName, "none", (long int) numThreads, (long int) numIters,
+	   (long int) 1, (long int) operations, (long int) runtime, (long int) average);
   else
-    printf("list-%s-%c,%ld,%ld,%ld,%ld,%ld,%ld,%ld", yieldName, syncCh, (long int)numThreads, (long int) numIters,
-	   (long int) numList, (long int) operations, (long int) runtime, (long int) average,(long int)averageLockTime);
+    printf("list-%s-%c,%ld,%ld,%ld,%ld,%ld,%ld", yieldName, syncCh, (long int)numThreads, (long int) numIters,
+	   (long int) 1, (long int) operations, (long int) runtime, (long int) average);
   printf("\n");
   exit(0);
   //  free(yieldName);

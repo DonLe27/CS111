@@ -36,17 +36,37 @@ set datafile separator ","
 unset xtics
 set xtics
 
-set title "List-4: Scalability of synchronization mechanisms"
+set title "List-1: Throughput of synchronization mechanisms"
 set xlabel "Threads"
 set logscale x 2
 unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y
-set output 'lab2_list-1.png'
+set output 'lab2b_list-1.png'
 set key left top
 plot \
-     "< grep -e 'list-none-m,[0-9]*,1000,' lab2b_list.csv" using ($2):($7)/(($3)/4) \
+     "< grep -e 'list-none-m,[0-9]*,1000,' lab2b_list.csv" using ($2):(1000000000/($7)) \
      title '(adjusted) list w/mutex' with linespoints lc rgb 'blue', \
-     "< grep -e 'list-none-s,[0-9]*,1000,' lab2b_list.csv" using ($2):($7)/(($3)/4) \
+     "< grep -e 'list-none-s,[0-9]*,1000,' lab2b_list.csv" using  ($2):(1000000000/($7)) \
      title '(adjusted) list w/spin-lock' with linespoints lc rgb 'green'
+
+
+# unset the kinky x axis
+unset xtics
+set xtics
+
+set title "List-1: Throughput of synchronization mechanisms"
+set xlabel "Threads"
+set logscale x 2
+unset xrange
+set xrange [0.75:]
+set ylabel "Total Number of Operations Per Second"
+set logscale y
+set output 'lab2b_list-2.png'
+set key left top
+plot \
+     "< grep -e 'list-none-m,[0-9]*,1000,' lab2b_list.csv" using ($2):($8) \
+     title 'Average Mutex Wait Time Against Threads' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-s,[0-9]*,1000,' lab2b_list.csv" using  ($2):($7) \
+     title 'Average Time Per Operations Against Threads' with linespoints lc rgb 'green'
