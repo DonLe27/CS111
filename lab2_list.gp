@@ -78,7 +78,8 @@ set xtics
 set title "List-3: Multiple Lists With and Without Protection"
 set xlabel "Threads"
 set logscale x 2
-set xrange [0.75:]
+set xrange [0.75:30]
+set yrange [0.75:100]
 set ylabel "Successful Iterations"
 set logscale y 10
 set output 'lab2b_list-3.png'
