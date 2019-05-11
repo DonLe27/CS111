@@ -13,10 +13,10 @@
 # 7. run time per operation (ns)
 #
 # output:
-# lab2_list-1.png ... cost per operation vs threads and iterations
-# lab2_list-2.png ... threads and iterations that run (un-protected) w/o failure
-# lab2_list-3.png ... threads and iterations that run (protected) w/o failure
-# lab2_list-4.png ... cost per operation vs number of threads
+# lab2b_1.png ... cost per operation vs threads and iterations
+# lab2b_2.png ... threads and iterations that run (un-protected) w/o failure
+# lab2b_3.png ... threads and iterations that run (protected) w/o failure
+# lab2b_4.png ... cost per operation vs number of threads
 #
 # Note:
 # Managing data is simplified by keeping all of the results in a single
@@ -43,7 +43,7 @@ unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y
-set output 'lab2b_list-1.png'
+set output 'lab2b_1.png'
 set key right top
 plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
@@ -63,7 +63,7 @@ unset xrange
 set xrange [0.75:]
 set ylabel "Time (ns) /Operations"
 set logscale y
-set output 'lab2b_list-2.png'
+set output 'lab2b_2.png'
 set key left top
 plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):($8) \
@@ -79,11 +79,11 @@ set title "List-3: Multiple Lists With and Without Protection"
 set xlabel "Threads"
 unset xrange
 unset yrange
-set xrange [0.75:30]
+set xrange [0.75:25]
 set yrange [0.75:100]
 set ylabel "Successful Iterations"
 set logscale y 10
-set output 'lab2b_list-3.png'
+set output 'lab2b_3.png'
 # note that unsuccessful runs should have produced no output
 plot \
      "< grep 'list-id-none,[0-9]*,[0-9]*,4' lab2_list.csv" using ($2):($3) \
@@ -105,7 +105,7 @@ unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y 10
-set output 'lab2b_list-4.png'
+set output 'lab2b_4.png'
 set key right bottom
 plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
@@ -129,7 +129,7 @@ unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
 set logscale y 10
-set output 'lab2b_list-5.png'
+set output 'lab2b_5.png'
 set key right top
 plot \
      "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \

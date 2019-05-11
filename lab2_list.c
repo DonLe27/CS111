@@ -38,8 +38,8 @@ void errorMessage(char *message, int ret)
   exit(ret);
 }
 
-pthread_mutex_t lock;
-volatile int spinlock = 0;
+pthread_mutex_t *mutexlock;
+volatile int *spinlock;
 void *wrapper(void* startVoid)
 {
   if (errorThrown != 0)//If on thread calls errorMessage, everyone exit
@@ -55,28 +55,28 @@ void *wrapper(void* startVoid)
 
       for (; i < end; i++)
 	{
-	  while (__sync_lock_test_and_set(&spinlock, 1)) {};      
+	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
 	  if (headElement[listKey].key != NULL)
 	    errorMessage("There was a problem with insertion", 2);
-	  __sync_lock_release(&spinlock);
+	  __sync_lock_release(&spinlock[listKey]);
 	}
 
-      while (__sync_lock_test_and_set(&spinlock, 1)) {};
+      while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
       if (SortedList_length(&headElement[listKey]) == -1)
 	errorMessage("There was an inconsistency when getting length", 2);
-      __sync_lock_release(&spinlock);
+      __sync_lock_release(&spinlock[listKey]);
 
 
       for (i = start; i < end; i++)
 	{
-	  while (__sync_lock_test_and_set(&spinlock, 1)) {};
+	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
 	  if (temp == NULL)
 	    errorMessage("There was an inconsistency when looking up", 2);
 	  if (SortedList_delete(temp) == 1)
 	    errorMessage("There was an inconsistency when deleting", 2);
-	  __sync_lock_release(&spinlock);
+	  __sync_lock_release(&spinlock[listKey]);
 	}
       
 
@@ -91,33 +91,33 @@ void *wrapper(void* startVoid)
       int i = start;
       for (; i < end; i++)
 	{
-	  clock_gettime(CLOCK_REALTIME, &begin);
-	  pthread_mutex_lock(&lock);
-	  clock_gettime(CLOCK_REALTIME, &finish);
+	  clock_gettime(CLOCK_MONOTONIC, &begin);
+	  pthread_mutex_lock(&mutexlock[listKey]);
+	  clock_gettime(CLOCK_MONOTONIC, &finish);
 	    runtime = ((1000000000* finish.tv_sec) + finish.tv_nsec) - ((1000000000* begin.tv_sec) + begin.tv_nsec);
 	    timeArray[timeIndex] += runtime;
 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
 	  if (headElement[listKey].key != NULL)
 	    errorMessage("There was a problem with insertion", 2);
-	  pthread_mutex_unlock(&lock);      
+	  pthread_mutex_unlock(&mutexlock[listKey]);      
 	}
       
-      clock_gettime(CLOCK_REALTIME, &begin);
-      pthread_mutex_lock(&lock);
-      clock_gettime(CLOCK_REALTIME, &finish);
+      clock_gettime(CLOCK_MONOTONIC, &begin);
+      pthread_mutex_lock(&mutexlock[listKey]);
+      clock_gettime(CLOCK_MONOTONIC, &finish);
       runtime = ((1000000000* finish.tv_sec) + finish.tv_nsec) - ((1000000000* begin.tv_sec) + begin.tv_nsec);
       timeArray[timeIndex] += runtime;
       if (SortedList_length(&headElement[listKey]) == -1)
 	errorMessage("There was an inconsistency when getting length", 2);
-      pthread_mutex_unlock(&lock);
+      pthread_mutex_unlock(&mutexlock[listKey]);
 
 
       for (i = start; i < end; i++)
 	{
 
-	  clock_gettime(CLOCK_REALTIME, &begin);
-	  pthread_mutex_lock(&lock);
-	  clock_gettime(CLOCK_REALTIME, &finish);
+	  clock_gettime(CLOCK_MONOTONIC, &begin);
+	  pthread_mutex_lock(&mutexlock[listKey]);
+	  clock_gettime(CLOCK_MONOTONIC, &finish);
 	  runtime = ((1000000000* finish.tv_sec) + finish.tv_nsec) - ((1000000000* begin.tv_sec) + begin.tv_nsec);
 	  timeArray[timeIndex] += runtime;
 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
@@ -125,7 +125,7 @@ void *wrapper(void* startVoid)
 	    errorMessage("There was an inconsistency when looking up", 2);
 	  if (SortedList_delete(temp) == 1)
 	    errorMessage("There was an inconsistency when deleting", 2);
-	  pthread_mutex_unlock(&lock);
+	  pthread_mutex_unlock(&mutexlock[listKey]);
 	}
       
       // pthread_mutex_unlock(&lock);
@@ -180,7 +180,7 @@ int main(int argc, char*argv[])
     {"threads", required_argument, 0, 't'},
     {"iterations", required_argument, 0, 'i'},
     {"yield", required_argument, 0, 'y'},
-    {"list", required_argument, 0, 'l'},
+    {"lists", required_argument, 0, 'l'},
     {"sync", required_argument, 0, 's'},
     {NULL, 0, NULL, 0}
   };
@@ -235,6 +235,8 @@ int main(int argc, char*argv[])
   //Allocate array of headElements
   numElements = numIters * numThreads; //numIters
   headElement = malloc(numList * sizeof(SortedListElement_t));
+  mutexlock = calloc(numList, sizeof(pthread_mutex_t));
+  spinlock = calloc(numList, sizeof(volatile int));
   if (headElement == NULL)
     errorMessage("Error allocating space for elements", 1);
   int h = 0;
@@ -261,8 +263,8 @@ int main(int argc, char*argv[])
     }
   struct timespec start;
   struct timespec end;
-  clock_gettime(CLOCK_REALTIME, &start);
-  clock_gettime(CLOCK_REALTIME, &end);
+  clock_gettime(CLOCK_MONOTONIC, &start);
+  clock_gettime(CLOCK_MONOTONIC, &end);
   //MAKE THREADS
   int* startArr = malloc(numThreads * sizeof(int));
   pthread_t threads[numThreads];
@@ -287,7 +289,7 @@ int main(int argc, char*argv[])
   if (SortedList_length(&headElement[0]) != 0)
     errorMessage("The list length was not 0 at the end: ", 2);
 
-  clock_gettime(CLOCK_REALTIME, &end);
+  clock_gettime(CLOCK_MONOTONIC, &end);
   long long runtime = ((1000000000* end.tv_sec) + end.tv_nsec) - ((1000000000* start.tv_sec) + start.tv_nsec);
   long operations = numThreads * numIters * 3;
   long average = runtime/operations;
