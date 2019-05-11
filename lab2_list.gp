@@ -46,10 +46,10 @@ set logscale y
 set output 'lab2b_list-1.png'
 set key left top
 plot \
-     "< grep -e 'list-none-m,[0-9]*,1000,' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '(adjusted) list w/mutex' with linespoints lc rgb 'blue', \
-     "< grep -e 'list-none-s,[0-9]*,1000,' lab2b_list.csv" using  ($2):(1000000000/($7)) \
-     title '(adjusted) list w/spin-lock' with linespoints lc rgb 'green'
+     "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title 'Throughput w/mutex' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using  ($2):(1000000000/($7)) \
+     title 'Throughput w/spin-lock' with linespoints lc rgb 'green'
 
 
 # unset the kinky x axis
@@ -61,15 +61,15 @@ set xlabel "Threads"
 set logscale x 2
 unset xrange
 set xrange [0.75:]
-set ylabel "Total Number of Operations Per Second"
+set ylabel "Time (ns) /Operations"
 set logscale y
 set output 'lab2b_list-2.png'
 set key left top
 plot \
-     "< grep -e 'list-none-m,[0-9]*,1000,' lab2b_list.csv" using ($2):($8) \
-     title 'Average Mutex Wait Time Against Threads' with linespoints lc rgb 'blue', \
-     "< grep -e 'list-none-s,[0-9]*,1000,' lab2b_list.csv" using  ($2):($7) \
-     title 'Average Time Per Operations Against Threads' with linespoints lc rgb 'green'
+     "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):($8) \
+     title 'Average Mutex Wait Time' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using  ($2):($7) \
+     title 'Average Time Per Operation' with linespoints lc rgb 'green'
 
 # unset the kinky x axis
 unset xtics
@@ -84,11 +84,11 @@ set logscale y 10
 set output 'lab2_list-3.png'
 # note that unsuccessful runs should have produced no output
 plot \
-     "< grep list-id-none lab2_list.csv" using ($2):($3) \
+     "< grep 'list-id-none,[0-9]*,[0-9]*,4' lab2_list.csv" using ($2):($3) \
      title 'no protection' with points lc rgb 'orange', \
-     "< grep list-id-s lab2_list.csv" using ($2):($3) \
+     "< grep 'list-id-s,[0-9]*,[0-9]*,4' lab2_list.csv" using ($2):($3) \
      title 'with spinlock' with points lc rgb 'green', \
-     "< grep list-id-m lab2_list.csv" using ($2):($3) \
+     "< grep 'list-id-m,[0-9]*,[0-9]*,4' lab2_list.csv" using ($2):($3) \
      title 'with mutex' with points lc rgb 'blue', \
 
 #lab2b_4.png 
@@ -102,8 +102,8 @@ set logscale x 2
 unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
-set logscale y
-set output 'lab2b_list-1.png'
+set logscale y 10
+set output 'lab2b_list-4.png'
 set key left top
 plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
@@ -126,8 +126,8 @@ set logscale x 2
 unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
-set logscale y
-set output 'lab2b_list-1.png'
+set logscale y 10
+set output 'lab2b_list-5.png'
 set key left top
 plot \
      "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
