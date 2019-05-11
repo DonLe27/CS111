@@ -56,7 +56,7 @@ plot \
 unset xtics
 set xtics
 
-set title "List-1: Throughput of synchronization mechanisms"
+set title "List-2: Time Waiting for Locks"
 set xlabel "Threads"
 set logscale x 2
 unset xrange
@@ -70,3 +70,74 @@ plot \
      title 'Average Mutex Wait Time Against Threads' with linespoints lc rgb 'blue', \
      "< grep -e 'list-none-s,[0-9]*,1000,' lab2b_list.csv" using  ($2):($7) \
      title 'Average Time Per Operations Against Threads' with linespoints lc rgb 'green'
+
+# unset the kinky x axis
+unset xtics
+set xtics
+
+set title "List-3: Multiple Lists With and Without Protection"
+set xlabel "Threads"
+set logscale x 2
+set xrange [0.75:]
+set ylabel "Successful Iterations"
+set logscale y 10
+set output 'lab2_list-3.png'
+# note that unsuccessful runs should have produced no output
+plot \
+     "< grep list-id-none lab2_list.csv" using ($2):($3) \
+     title 'no protection' with points lc rgb 'orange', \
+     "< grep list-id-s lab2_list.csv" using ($2):($3) \
+     title 'with spinlock' with points lc rgb 'green', \
+     "< grep list-id-m lab2_list.csv" using ($2):($3) \
+     title 'with mutex' with points lc rgb 'blue', \
+
+#lab2b_4.png 
+# unset the kinky x axis
+unset xtics
+set xtics
+
+set title "List-4: Throughput with Multiple List and Mutex Lock"
+set xlabel "Threads"
+set logscale x 2
+unset xrange
+set xrange [0.75:]
+set ylabel "Total Number of Operations Per Second"
+set logscale y
+set output 'lab2b_list-1.png'
+set key left top
+plot \
+     "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '1 List w/mutex' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-m,[0-9]*,1000,4' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '4 Lists w/mutex' with linespoints lc rgb 'green', \
+     "< grep -e 'list-none-m,[0-9]*,1000,8' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '8 Lists w/mutex' with linespoints lc rgb 'red', \
+     "< grep -e 'list-none-m,[0-9]*,1000,16' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '16 List w/mutex' with linespoints lc rgb 'orange'
+
+#lab2b_5.png 
+# unset the kinky x axis
+unset xtics
+set xtics
+
+set title "List-4: Throughput with Multiple List and Spin Lock"
+set xlabel "Threads"
+set logscale x 2
+unset xrange
+set xrange [0.75:]
+set ylabel "Total Number of Operations Per Second"
+set logscale y
+set output 'lab2b_list-1.png'
+set key left top
+plot \
+     "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '1 List w/mutex' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-s,[0-9]*,1000,4' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '4 Lists w/mutex' with linespoints lc rgb 'green', \
+     "< grep -e 'list-none-s,[0-9]*,1000,8' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '8 Lists w/mutex' with linespoints lc rgb 'red', \
+     "< grep -e 'list-none-s,[0-9]*,1000,16' lab2b_list.csv" using ($2):(1000000000/($7)) \
+     title '16 List w/mutex' with linespoints lc rgb 'orange'
+
+
+
