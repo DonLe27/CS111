@@ -1,3 +1,38 @@
 NAME: Don Le
 EMAIL: donle22599@g.ucla.edu
 ID: 804971410
+
+Question 2.3.1 
+Where do you believe most of the cycles are spent in the 1 and 2-thread list tests ?
+Why do you believe these to be the most expensive parts of the code?
+
+The cycles are spent differently depending on the options for 1 and 2-thread list test.
+For mutexes, most of the time goes to list operations for both 1 and 2-thread lists. Since mutexes make the threads sleep instead of using cycles, the expensive list operations take the most cycles.
+For spin locks with 1 thread, most of the time will also go to list operations. Since there is no contention with only 1 thread, getting the spin lock will take minimal cycles.
+For spin locks with 2 threads, I think most of the time is still spent with list operations due to how expensive they are. However, more of the cycles are spent in getting the spin lock than in other cases as a thread will not sleep while waiting for a lock to be released and waste cycles.
+
+Where do you believe most of the time/cycles are being spent in the high-thread spin-lock tests?
+Where do you believe most of the time/cycles are being spent in the high-thread mutex tests?
+
+In a high-thread spin-lock test, most of the cylces are spent in getting the spin lock. With many threads, there is high contention for the crtical sections and the lock is shared between many threads. This means a thread may have to wait a long time for the lock and waste cycles.
+
+Question 2.3.2
+Where (what lines of code) are consuming most of the cycles when the spin-lock version of the list exerciser is run with a large number of threads?
+Why does this operation become so expensive with large numbers of threads?
+
+Most of the cycles are consumed on lines 58 and 73, when threads try to get the spin lock. With many threads, there is high contention for the crtical sections and the lock is shared between many threads. This means a thread may have to wait a long time for the lock and waste cycles.
+
+Question 2.3.3
+Why does the average lock-wait time rise so dramatically with the number of contending threads?
+Why does the completion time per operation rise (less dramatically) with the number of contending threads?
+How is it possible for the wait time per operation to go up faster (or higher) than the completion time per operation?
+
+Similar to spin locks, when there are many threads wait time for getting a mutex lock can dramatically increase. This is because with more threads, there is high contention for the critical sections and the lock is shared between more threads. Each thread is competing with all the other threads and has to wait longer if there are more threads.
+
+Completion time per operation rises because with more threads, there is more overhead from creating threads, context switches, and more time spent waiting for locks. It rises less dramatically than wait time because completion time measures the time it took for the whole operation to complete, not taking into account parrelism. Measuring wait time does, however, because it measure the wait time for each individual thread, even when the wait times overlap. Since completion time doesn't consider overlapping threads waiting, wait time per operations can go up faster than completion time per operation.
+
+Question 2.3.4 
+Explain the change in performance of the synchronized methods as a function of the number of lists.
+Should the throughput continue increasing as the number of lists is further increased? If not, explain why not.
+It seems reasonable to suggest the throughput of an N-way partitioned list should be equivalent to the throughput of a single list with fewer (1/N) threads. Does this appear to be true in the above curves? If not, explain why not.
+

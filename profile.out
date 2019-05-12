@@ -1,16 +1,11 @@
-Total: 217 samples
-     131  60.4%  60.4%      217 100.0% wrapper
-      59  27.2%  87.6%       61  28.1% SortedList_insert
-      24  11.1%  98.6%       24  11.1% SortedList_lookup
-       1   0.5%  99.1%        1   0.5% SortedList_length
-       1   0.5%  99.5%        2   0.9% __GI___libc_malloc
-       1   0.5% 100.0%        1   0.5% __mmap64
-       0   0.0% 100.0%      217 100.0% __clone
-       0   0.0% 100.0%        1   0.5% arena_get2.isra.3
-       0   0.0% 100.0%        1   0.5% new_heap
-       0   0.0% 100.0%      217 100.0% start_thread
+Total: 165 samples
+     120  72.7%  72.7%      165 100.0% wrapper
+      30  18.2%  90.9%       30  18.2% SortedList_insert
+      15   9.1% 100.0%       15   9.1% SortedList_lookup
+       0   0.0% 100.0%      165 100.0% __clone
+       0   0.0% 100.0%      165 100.0% start_thread
 ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/lab2_list.c
-   131    217 Total samples (flat / cumulative)
+   120    165 Total samples (flat / cumulative)
      .      .   39: }
      .      .   40: 
      .      .   41: pthread_mutex_t *mutexlock;
@@ -31,23 +26,23 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .   55: 
      .      .   56:       for (; i < end; i++)
      .      .   57: 	{
-    85     85   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
-     .     61   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
+    82     82   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
+     .     30   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
      .      .   60: 	  if (headElement[listKey].key != NULL)
      .      .   61: 	    errorMessage("There was a problem with insertion", 2);
      .      .   62: 	  __sync_lock_release(&spinlock[listKey]);
      .      .   63: 	}
      .      .   64: 
      .      .   65:       while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
-     .      1   66:       if (SortedList_length(&headElement[listKey]) == -1)
+     .      .   66:       if (SortedList_length(&headElement[listKey]) == -1)
      .      .   67: 	errorMessage("There was an inconsistency when getting length", 2);
      .      .   68:       __sync_lock_release(&spinlock[listKey]);
      .      .   69: 
      .      .   70: 
      .      .   71:       for (i = start; i < end; i++)
      .      .   72: 	{
-    46     46   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
-     .     24   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
+    38     38   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
+     .     15   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
      .      .   75: 	  if (temp == NULL)
      .      .   76: 	    errorMessage("There was an inconsistency when looking up", 2);
      .      .   77: 	  if (SortedList_delete(temp) == 1)
@@ -135,7 +130,7 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .  158:   char *temp = malloc(length * sizeof(char));
      .      .  159:   if (temp == NULL)
 ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/lab2_list.c
-   131    217 Total samples (flat / cumulative)
+   120    165 Total samples (flat / cumulative)
      .      .   39: }
      .      .   40: 
      .      .   41: pthread_mutex_t *mutexlock;
@@ -156,23 +151,23 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .   55: 
      .      .   56:       for (; i < end; i++)
      .      .   57: 	{
-    85     85   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
-     .     61   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
+    82     82   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
+     .     30   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
      .      .   60: 	  if (headElement[listKey].key != NULL)
      .      .   61: 	    errorMessage("There was a problem with insertion", 2);
      .      .   62: 	  __sync_lock_release(&spinlock[listKey]);
      .      .   63: 	}
      .      .   64: 
      .      .   65:       while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
-     .      1   66:       if (SortedList_length(&headElement[listKey]) == -1)
+     .      .   66:       if (SortedList_length(&headElement[listKey]) == -1)
      .      .   67: 	errorMessage("There was an inconsistency when getting length", 2);
      .      .   68:       __sync_lock_release(&spinlock[listKey]);
      .      .   69: 
      .      .   70: 
      .      .   71:       for (i = start; i < end; i++)
      .      .   72: 	{
-    46     46   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
-     .     24   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
+    38     38   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
+     .     15   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
      .      .   75: 	  if (temp == NULL)
      .      .   76: 	    errorMessage("There was an inconsistency when looking up", 2);
      .      .   77: 	  if (SortedList_delete(temp) == 1)
