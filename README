@@ -36,3 +36,8 @@ Explain the change in performance of the synchronized methods as a function of t
 Should the throughput continue increasing as the number of lists is further increased? If not, explain why not.
 It seems reasonable to suggest the throughput of an N-way partitioned list should be equivalent to the throughput of a single list with fewer (1/N) threads. Does this appear to be true in the above curves? If not, explain why not.
 
+As the number of lists increases, performance increases. This is because with more lists, there will be less contention for each lock, increasing parallelism.
+
+Throughput will not continue increasing if the number of lists is great enough that each thread has its own list and contention between threads is virtually zero. At that point, increasing the number of lists will not reduce wait time for threads and will not improve throughput. 
+
+The throughput of a N-way partioned list is not equivalent to the throughput of a single list with fewer (1/N) threads. When a list is partitioned, each operation traverses a shorter list, reducing how much time is spent in the critical sections and lowering the chance of ceontention.

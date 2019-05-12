@@ -104,42 +104,41 @@ set logscale x 2
 unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
-set logscale y 10
+set logscale y
+set yrange [10000: 10000000]
 set output 'lab2b_4.png'
 set key right bottom
 plot \
-     "< grep -e 'list-none-m,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '1 List w/mutex' with linespoints lc rgb 'blue', \
-     "< grep -e 'list-none-m,[0-9]*,1000,4' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '4 Lists w/mutex' with linespoints lc rgb 'green', \
-     "< grep -e 'list-none-m,[0-9]*,1000,8' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '8 Lists w/mutex' with linespoints lc rgb 'red', \
-     "< grep -e 'list-none-m,[0-9]*,1000,16' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '16 List w/mutex' with linespoints lc rgb 'orange'
+     "< grep -e 'list-none-m,[0-9]*,1000,1,' lab2b_list.csv" using ($2):(1000000000/($7))\
+        title '1 List w/mutex' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-m,[0-9]*,1000,4,' lab2b_list.csv" using ($2):(1000000000/($7))\
+        title '2 Lists w/mutex' with linespoints lc rgb 'green', \
+     "< grep -e 'list-none-m,[0-9]*,1000,8,' lab2b_list.csv" using ($2):(1000000000/($7))\
+        title '8 Lists w/mutex' with linespoints lc rgb 'red', \
+     "< grep -e 'list-none-m,[0-9]*,1000,16,' lab2b_list.csv" using ($2):(1000000000/($7))\
+        title '16 Lists w/mutex' with linespoints lc rgb 'orange'
 
 #lab2b_5.png 
 # unset the kinky x axis
 unset xtics
 set xtics
 
-set title "List-4: Throughput with Multiple List and Spin Lock"
+set title "List-5: Throughput with Multiple List and Spin Lock"
 set xlabel "Threads"
 set logscale x 2
 unset xrange
 set xrange [0.75:]
 set ylabel "Total Number of Operations Per Second"
-set logscale y 10
+set logscale y
+set yrange [10000: 10000000]
 set output 'lab2b_5.png'
 set key right top
 plot \
-     "< grep -e 'list-none-s,[0-9]*,1000,1' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '1 List w/mutex' with linespoints lc rgb 'blue', \
-     "< grep -e 'list-none-s,[0-9]*,1000,4' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '4 Lists w/mutex' with linespoints lc rgb 'green', \
-     "< grep -e 'list-none-s,[0-9]*,1000,8' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '8 Lists w/mutex' with linespoints lc rgb 'red', \
-     "< grep -e 'list-none-s,[0-9]*,1000,16' lab2b_list.csv" using ($2):(1000000000/($7)) \
-     title '16 List w/mutex' with linespoints lc rgb 'orange'
-
-
-
+     "< grep -e 'list-none-s,[0-9]*,1000,1,' lab2b_list.csv" using ($2):(1000000000/($7))\
+     title '1 List w/spin' with linespoints lc rgb 'blue', \
+     "< grep -e 'list-none-s,[0-9]*,1000,4,' lab2b_list.csv" using ($2):(1000000000/($7))\
+     title '4 Lists w/spin' with linespoints lc rgb 'green', \
+     "< grep -e 'list-none-s,[0-9]*,1000,8,' lab2b_list.csv" using ($2):(1000000000/($7))\
+     title '8 Lists w/spin' with linespoints lc rgb 'red', \
+     "< grep -e 'list-none-s,[0-9]*,1000,16,' lab2b_list.csv" using ($2):(1000000000/($7))\
+     title '16 List w/spin' with linespoints lc rgb 'orange'

@@ -1,11 +1,11 @@
-Total: 165 samples
-     120  72.7%  72.7%      165 100.0% wrapper
-      30  18.2%  90.9%       30  18.2% SortedList_insert
-      15   9.1% 100.0%       15   9.1% SortedList_lookup
-       0   0.0% 100.0%      165 100.0% __clone
-       0   0.0% 100.0%      165 100.0% start_thread
+Total: 147 samples
+     108  73.5%  73.5%      147 100.0% wrapper
+      25  17.0%  90.5%       25  17.0% SortedList_insert
+      14   9.5% 100.0%       14   9.5% SortedList_lookup
+       0   0.0% 100.0%      147 100.0% __clone
+       0   0.0% 100.0%      147 100.0% start_thread
 ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/lab2_list.c
-   120    165 Total samples (flat / cumulative)
+   108    147 Total samples (flat / cumulative)
      .      .   39: }
      .      .   40: 
      .      .   41: pthread_mutex_t *mutexlock;
@@ -26,8 +26,8 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .   55: 
      .      .   56:       for (; i < end; i++)
      .      .   57: 	{
-    82     82   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
-     .     30   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
+    90     90   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
+     .     25   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
      .      .   60: 	  if (headElement[listKey].key != NULL)
      .      .   61: 	    errorMessage("There was a problem with insertion", 2);
      .      .   62: 	  __sync_lock_release(&spinlock[listKey]);
@@ -41,8 +41,8 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .   70: 
      .      .   71:       for (i = start; i < end; i++)
      .      .   72: 	{
-    38     38   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
-     .     15   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
+    18     18   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
+     .     14   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
      .      .   75: 	  if (temp == NULL)
      .      .   76: 	    errorMessage("There was an inconsistency when looking up", 2);
      .      .   77: 	  if (SortedList_delete(temp) == 1)
@@ -130,7 +130,7 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .  158:   char *temp = malloc(length * sizeof(char));
      .      .  159:   if (temp == NULL)
 ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/lab2_list.c
-   120    165 Total samples (flat / cumulative)
+   108    147 Total samples (flat / cumulative)
      .      .   39: }
      .      .   40: 
      .      .   41: pthread_mutex_t *mutexlock;
@@ -151,8 +151,8 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .   55: 
      .      .   56:       for (; i < end; i++)
      .      .   57: 	{
-    82     82   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
-     .     30   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
+    90     90   58: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};      
+     .     25   59: 	  SortedList_insert(&headElement[listKey], &elementArray[i]);
      .      .   60: 	  if (headElement[listKey].key != NULL)
      .      .   61: 	    errorMessage("There was a problem with insertion", 2);
      .      .   62: 	  __sync_lock_release(&spinlock[listKey]);
@@ -166,8 +166,8 @@ ROUTINE ====================== wrapper in /u/eng/class/classdle/cs111/project2b/
      .      .   70: 
      .      .   71:       for (i = start; i < end; i++)
      .      .   72: 	{
-    38     38   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
-     .     15   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
+    18     18   73: 	  while (__sync_lock_test_and_set(&spinlock[listKey], 1)) {};
+     .     14   74: 	  SortedList_t * temp = SortedList_lookup(&headElement[listKey], elementArray[i].key);
      .      .   75: 	  if (temp == NULL)
      .      .   76: 	    errorMessage("There was an inconsistency when looking up", 2);
      .      .   77: 	  if (SortedList_delete(temp) == 1)
