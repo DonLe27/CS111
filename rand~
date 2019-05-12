@@ -1,0 +1,7 @@
+8 lists and 16 threads
+
+vs
+
+1 list and 2 thread
+
+same list to thread ratio but each list has to traverse more

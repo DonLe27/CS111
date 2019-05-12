@@ -40,4 +40,4 @@ As the number of lists increases, performance increases. This is because with mo
 
 Throughput will not continue increasing if the number of lists is great enough that each thread has its own list and contention between threads is virtually zero. At that point, increasing the number of lists will not reduce wait time for threads and will not improve throughput. 
 
-The throughput of a N-way partioned list is not equivalent to the throughput of a single list with fewer (1/N) threads. When a list is partitioned, each operation traverses a shorter list, reducing how much time is spent in the critical sections and lowering the chance of ceontention.
+The throughput of a N-way partioned list is not equivalent to the throughput of a single list with fewer (1/N) threads. When a list is partitioned, each operation traverses a shorter list, reducing how much time is spent in the critical sections and lowering the chance of ceontention. Thus, even though the single list might have the same list to thread ratio, each thread is more likely to have to wait longer, decreasing throughput. 
