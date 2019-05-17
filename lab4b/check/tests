@@ -1,0 +1,20 @@
+#!/bin/bash
+for p in lab4b
+do
+	echo "... $p detects/reports bogus arguments"
+	./$p --bogus < /dev/tty > /dev/null 2>STDERR
+	if [ $? -ne 1 ]
+	then
+		echo "Failed return code for invalid options"
+	else
+		echo "Passed return code for invalid options"
+	fi
+	if [ ! -s STDERR ]
+	then
+		echo "No Usage message to stderr for --bogus"
+		let errors+=1
+	else
+		echo -n "Passed error test "
+		cat STDERR
+	fi
+done

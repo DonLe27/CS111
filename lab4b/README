@@ -1,0 +1,14 @@
+NAME: Don Le
+EMAIL: donle22599@g.ucla.edu
+ID: 804971410
+
+Files:
+README - contains descriptions of included files in tarball
+
+lab4b.c - contains source code for program that runs temperature reports
+
+Makefile - contains targets for make, dist, and clean
+
+Sources:
+Polling - https://linux.die.net/man/3/poll
+Temperature example - http://wiki.seeedstudio.com/Grove-Temperature_Sensor_V1.2/

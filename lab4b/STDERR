@@ -1,0 +1,2 @@
+./lab4b: unrecognized option '--bogus'
+Invalid option. Use --period=#, --scale=[FC], or --log=filename
